@@ -9,5 +9,5 @@ Program currently under testing and debugging.
 
 A short demo is provided:
 
-<img src="https://github.com/wangqi1990uc/ez-afm/blob/master/afm-demo.gif" width="80%" height="80%" />
+<img src="https://github.com/wangqi1990uc/ez-afm/blob/master/afm-demo.gif" width="50%" height="50%" />
 
