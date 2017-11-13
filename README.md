@@ -9,4 +9,4 @@ Program currently under testing and debugging.
 
 A short demo is provided:
 
-![afm_demo] (afm-demo.gif)
+![afm_demo] (https://github.com/wangqi1990uc/ez-afm/blob/master/afm-demo.gif)
