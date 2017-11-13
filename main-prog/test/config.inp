@@ -1,0 +1,40 @@
+!o CHARMM-like input but not exactly the same.
+!o This program does not have the 4-character rule, so make sure use the full name of keywords.
+!o Values in the triangle bracket are the default value.
+!o Use curly brackets {} to refer a variable to eliminate ambiguity such as @a and @ab.
+
+set protname = 1ubq	! The equal sign (=) is optional.
+set nstep    = 1000000! <100>
+set tstep    = 1    ! <1> timestep in ps.
+set zeta     = 50   ! <50>	damping coefficient.
+set temp     = 298	! <298> temperature in Kelvin.
+set outfreq  = 5000 ! <10> frequency to write energy info and .afm files.
+set dcdfreq  = 1    !<10> frequency to write coordinate
+set nbdfreq  = 10	! <10> frequency to update nonbonded list
+set dijfreq  = 10   ! <10> frequency to update diffusion tensor, will be ignored when "hydro" is set to "none".
+set hydro    = none	! <none> hydrodynamics [cholesky], [tea], or [none]
+
+! Read toppar and system
+read prm	@{protname}.prm
+read psf	@{protname}.psf
+read cor	@{protname}.cor
+
+! Energy minimization
+! <10> 
+!mini sd   5
+
+! AFM setup, if cterm or nterm not specified, the first residue will be fixed and
+! the last residue will be attached to the imaginary micro-cantilever.
+
+!afm cterm 1 nterm 100 force 100 velocity 100 maxdist 100 afmfile @{protname}.afm
+!afm force 100 velocity 100 maxdist 100 afmfile @{protname}.afm
+afm type auto ! force = 100; velocity = 1e-6; maxdist = (natom-2)*3.8 A;
+
+! Run dynamics
+! Use -1 to turn off energy check (absolute energy difference between adjacent steps).
+! Use -1 as corname or dcdname to turn off saving coordinate or trajectory. 
+dyna hydro @{hydro} nstep @{nstep} tstep @{tstep} temp @{temp} zeta @{zeta} -
+     dcdfreq @{dcdfreq} nbdfreq @{nbdfreq} outfreq @{outfreq} dijfreq @{dijfreq} - 
+     echeck -1 dcdname @{protname}-bdhi.dcd
+
+stop
