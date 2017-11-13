@@ -5,4 +5,4 @@ Generate paramter files using gen-top, then run dynamics with main-prog.
 
 All the files (`crd`, `psf`, `dcd`, `prm` and `rtf`) generated will be compatible with CHARMM package for further analysis.
 
-Program currently under testing and debugging. A short demo can be found at `main-prog/test`.
+Program currently under testing and debugging. A short demo is provided (afm-demo.gif).
