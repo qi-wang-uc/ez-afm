@@ -7,7 +7,7 @@ All the files (`crd`, `psf`, `dcd`, `prm` and `rtf`) generated will be compatibl
 
 Program currently under testing and debugging. 
 
-A short demo is provided:
+A short demo of ubiquitin AFM-like pulling is provided:
 
 <img src="https://github.com/wangqi1990uc/ez-afm/blob/master/afm-demo.gif" width="50%" height="50%" />
 
