@@ -16,13 +16,15 @@ where:
 
 <a href="https://www.codecogs.com/eqnedit.php?latex=V_{\mathrm{non-bonded}}&space;=&space;\sum_{\mathrm{non-native}}\epsilon_1&space;\big(&space;\frac{\sigma_{i,j}}{r_{i,j}}\big)^{12}&space;&plus;&space;\sum_{\mathrm{native}}\epsilon_2\big[&space;\big(&space;\frac{\sigma_{i,j}}{r_{i,j}}\big)^{12}-\big(\frac{\sigma_{i,j}}{r_{i,j}}&space;\big)^6\big]" target="_blank"><img src="https://latex.codecogs.com/png.latex?V_{\mathrm{non-bonded}}&space;=&space;\sum_{\mathrm{non-native}}\epsilon_1&space;\big(&space;\frac{\sigma_{i,j}}{r_{i,j}}\big)^{12}&space;&plus;&space;\sum_{\mathrm{native}}\epsilon_2\big[&space;\big(&space;\frac{\sigma_{i,j}}{r_{i,j}}\big)^{12}-\big(\frac{\sigma_{i,j}}{r_{i,j}}&space;\big)^6\big]" title="V_{\mathrm{non-bonded}} = \sum_{\mathrm{non-native}}\epsilon_1 \big( \frac{\sigma_{i,j}}{r_{i,j}}\big)^{12} + \sum_{\mathrm{native}}\epsilon_2\big[ \big( \frac{\sigma_{i,j}}{r_{i,j}}\big)^{12}-\big(\frac{\sigma_{i,j}}{r_{i,j}} \big)^6\big]" /></a>
 
-Generate paramter files using gen-top, then run dynamics with main-prog.
+## Brownian Dynamics
+The displacement propagation of the system is obtained by solving the following equation numerically:
 
-All the files (`crd`, `psf`, `dcd`, `prm` and `rtf`) generated will be compatible with CHARMM package for further analysis.
+<a href="https://www.codecogs.com/eqnedit.php?latex=\xi&space;\frac{\mathrm{d}r}{\mathrm{d}t}=-\frac{\partial&space;V_i(r_i)}{\partial&space;r_i}&plus;g_i(t)" target="_blank"><img src="https://latex.codecogs.com/png.latex?\xi&space;\frac{\mathrm{d}r}{\mathrm{d}t}=-\frac{\partial&space;V_i(r_i)}{\partial&space;r_i}&plus;g_i(t)" title="\xi \frac{\mathrm{d}r}{\mathrm{d}t}=-\frac{\partial V_i(r_i)}{\partial r_i}+g_i(t)" /></a>
 
-Program currently under testing and debugging. 
-
-A short demo of ubiquitin AFM-like pulling is provided:
+##Notes
+- Generate paramter files using gen-top, then run dynamics with main-prog.
+- All the files (`crd`, `psf`, `dcd`, `prm` and `rtf`) generated will be compatible with CHARMM package for further analysis.
+- Program currently under testing and debugging. 
+- A short demo of ubiquitin AFM-like pulling is provided:
 
 <img src="https://github.com/wangqi1990uc/ez-afm/blob/master/afm-demo.gif" width="50%" height="50%" />
-
