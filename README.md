@@ -38,5 +38,5 @@ The displacement propagation of the system is obtained by solving the following 
 
 
 ## TODO
-- [ ] better user variable handling
-- [ ] Add hydrodynamic interation tensor
+- [ ] Better user variable handling
+- [ ] Add hydrodynamic interaction tensor
