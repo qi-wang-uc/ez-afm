@@ -4,47 +4,44 @@
 #include <vector>
 #include <map>
 #include <iomanip>
-#include "../include/uservar.h"
+#include "../include/uservar.hpp"
 
-/* User defined variable table */ 
-static std::map<std::string,std::string> uservar;
-
-/* Add user defined variable */
-void set_uservar(std::vector<std::string> cmds) {
-	uservar[cmds[1]] = ("="==cmds[2]) ? cmds[3]:cmds[2];
+void UserVar::print(void) {
+    std::cout << this->_table.size() << std::endl;
+	std::cout << "EZAFM> User-defined variables " << std::endl;
+	for (auto& uv : this->_table) {
+        std::cout << std::setw(10) << uv.first 
+                  << " : " 
+                  << std::setw(10) << uv.second
+                  << std::endl;
+    }
+    std::cout << "EZAFM> " << std::endl;
 }
 
-/* Variable substitution */
-std::string get_uservar(std::string name) {
-    std::string false_entry = "";
+void UserVar::update(std::vector<std::string> cmds) {
+	this->_table[cmds[1]] = ("="==cmds[2]) ? cmds[3]:cmds[2];
+}
+
+std::string UserVar::query(std::string& name) const {
+    std::string invalid_query = "";
+    std::cout << "UserVar> Retriving (" << name << ")" << std::endl;
     while(name.find("@")!=std::string::npos) {
-        /*  The usage of user-defined variables should be like:
-            xxx@{var1}xxx@{var2}...
-            In every iteration, the firt occurence of '@' would be an identifier as 
-            beginning and '}' as the end of a variable.
-            Here we use [ var = @{val} ] for variable nomenclature.
-        */
         auto var_begin = name.find_first_of("@");
         auto val_begin = var_begin + 2;
-        auto left_bracket  = name.find_first_of("{");
-        auto right_bracket = name.find_first_of("}");
-        auto len_of_val = right_bracket - left_bracket - 1;
+        auto left_brace  = name.find_first_of("{");
+        auto right_brace = name.find_first_of("}");
+        auto len_of_val = right_brace - left_brace - 1;
         auto len_of_var = len_of_val + 3;
         std::string var = name.substr(var_begin, len_of_var);
         std::string val = name.substr(val_begin, len_of_val);
-        if(uservar.find(val)==uservar.end()) {
-            std::cout << "ERROR> Cannot find (" << val << ") in user defined variables." << std::endl; 
-            return false_entry;
+        if(this->_table.find(val)==this->_table.end()) {
+            std::cout << "ERROR> Cannot find (" << val 
+                      << ") in user defined variables." 
+                      << std::endl;
+            return invalid_query;
         }
-        name = name.replace(name.find_first_of("@"), len_of_var, uservar[val]);
+        name = name.replace(name.find_first_of("@"), len_of_var, this->_table.at(val));
     }
     return name;
 }
 
-void print_uservar() {
-	std::cout << "*** User-defined variables ***" << std::endl;
-	for (auto it_uv=uservar.begin(); it_uv!=uservar.end(); ++it_uv)
-		std::cout << std::setw(10) << it_uv->first << " : " 
-			<<  it_uv->second << std::setw(10) << std::endl;
-    std::cout << "******************************" << std::endl;
-}

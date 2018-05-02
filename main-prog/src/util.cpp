@@ -6,29 +6,7 @@
 #include <sstream>
 #include <iomanip>
 #include <cstdlib>
-#include "../include/util.h"
-#include "../include/energy.h"
-#include "../include/coor.h"
-#include "../include/random.h"
-
-void print_banner() {
-    std::cout << "-----------------" << std::endl;
-    std::cout << "EZAFM version 1.0" << std::endl;
-    std::cout << "-----------------" << std::endl;
-}
-
-void debug(std::string msg) {
-    std::cout << "DEBUG> " << msg << std::endl;
-}
-
-/*check if the program has input file*/
-bool has_input(const int inp_num) {
-    if(inp_num < 2) {
-        std::cout << "ERROR> Missing input file." << std::endl;
-        return false;
-    } 
-    return true;
-}
+#include "../include/util.hpp"
 
 /*check if a string can be converted to integer*/
 bool is_integer(std::string inp_str) {
@@ -63,7 +41,7 @@ bool is_single_word(const std::string &inp_str) {
     return count==1;
 }
 
-unsigned int n_of_words(const std::string &inp_str) {
+size_t n_of_words(const std::string &inp_str) {
     int counter = 0;
     std::stringstream tmp_stream(inp_str);
     std::string tmp_holder;
@@ -71,8 +49,8 @@ unsigned int n_of_words(const std::string &inp_str) {
     return counter;
 }
 
-void skip_n_words(std::stringstream &inp_stream, unsigned int nskip) {
-	unsigned int counter = 0;
+void skip_n_words(std::stringstream &inp_stream, size_t nskip) {
+	size_t counter = 0;
 	std::string dummy;
 	while(counter < nskip) {
 		inp_stream >> dummy;
@@ -80,7 +58,24 @@ void skip_n_words(std::stringstream &inp_stream, unsigned int nskip) {
 	}
 }
 
-void print_boundary(unsigned int n) {
+void print_boundary(size_t n) {
     std::string s(n, '*');
     std::cout << s << std::endl;
+}
+
+void time_elapsed(SysClock tick, SysClock tock) {
+    auto duration = tock - tick;
+    auto seconds =  std::chrono::duration_cast<std::chrono::seconds>(duration);
+    auto total_seconds = seconds.count();
+    auto n_hours   =  (total_seconds / 3600);
+    auto n_minutes =  (total_seconds - n_hours*3600)/60;
+    auto n_seconds =  (total_seconds - n_hours*3600 - n_minutes*60);
+    std::cout << "EZAFM> Time elapsed: "
+              << "(" << n_hours   << ") HR : "
+              << "(" << n_minutes << ") MIN : "
+              << "(" << n_seconds << ") SEC" << std::endl;
+}
+
+void debug(int code) {
+    std::cout << ">>>>>>>> DEBUG :" << code << std::endl;
 }

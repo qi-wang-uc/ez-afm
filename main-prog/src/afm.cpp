@@ -1,69 +1,42 @@
 #include <iostream>
 #include <iomanip>
 #include <map>
-#include "../include/energy.h"
-#include "../include/main.h"
-#include "../include/coor.h"
-#include "../include/afm.h"
-#include "../include/psf.h"
-#include "../include/uservar.h"
+#include "../include/energy.hpp"
+#include "../include/coor.hpp"
+#include "../include/uservar.hpp"
 
-static Afm_Info afm_info;
-/* Converts forces from (kcal/mol)/A to pN  */
-const real fconv = 69.478508;
-
-bool prep_afm(std::vector<std::string> cmds) {
-    std::cout << "PREPAFM> Preparing for AFM-like simulation setup." << std::endl;
+void AFM::setup_afm(std::vector<std::string> cmds, UserVar& user_var) {
+    std::cout << "PrepAFM> Preparing for AFM-like simulation setup." << std::endl;
     std::map<std::string,std::string> afm_opt;
     for(auto it_cmd=cmds.begin()+1; it_cmd!=cmds.end(); it_cmd+=2) {
-        auto retrieved_var = get_uservar(*(it_cmd+1));
-        if(retrieved_var.empty()) return false;
+        auto retrieved_var = user_var.query(*(it_cmd+1));
         afm_opt[*it_cmd] = retrieved_var;
     }
-    std::cout << "PREPAFM> The following parameters will be used for AFM setup:" << std::endl;
-    std::cout << "******************************" << std::endl;
+    std::cout << "PrepAFM> The following parameters will be used:" << std::endl;
     for(auto it_afm=afm_opt.begin();it_afm!=afm_opt.end(); it_afm++) {
             std::cout << std::left 
-                << std::setw(10) <<"[" + it_afm->first + "]" << " is set to " 
-                << std::setw(10) << it_afm->second << std::endl;
+                  << std::setw(10) << it_afm->first  << " = " 
+                  << std::setw(10) << it_afm->second << std::endl;
     }
-    std::cout << "******************************" << std::endl;
     /* afm initialization */
-    fix_atom(afm_info.nterm);
-    auto natom = get_psf_info().natom;
-    afm_info.do_afm = true;
-    afm_info.cterm = natom;
-    afm_info.max_dist = (natom-2)*3.8;
-    afm_info.v_afm = 1e-5;
-    afm_info.k_afm = 200.0;
-    auto i = afm_info.nterm - 1;
-    auto j = afm_info.cterm - 1;
-    Vector r_n(get_xcoor(i),get_ycoor(i),get_zcoor(i));
-    Vector r_c(get_xcoor(j),get_ycoor(j),get_zcoor(j));
-    Vector r_nc = r_n - r_c;
-    afm_info.tmp_dist = r_nc.norm();
-    /**********************/
-    return true;
+    this->_afm_config.do_afm = true;
+    this->_afm_config.nterm  = std::stol(afm_opt["nterm"]);
+    this->_afm_config.cterm  = std::stol(afm_opt["cterm"]);
+    this->_afm_config.k_afm  = std::stof(afm_opt["force"]);
+    this->_afm_config.v_afm  = std::stof(afm_opt["velocity"]);
+    this->_afm_config.max_dist = std::stof(afm_opt["maxdist"]);
 }
 
-void apply_afm(real tstep) {
-    auto i = afm_info.nterm - 1;
-    auto j = afm_info.cterm - 1;
-    Vector r_n(get_xcoor(i),get_ycoor(i),get_zcoor(i));
-    Vector r_c(get_xcoor(j),get_ycoor(j),get_zcoor(j));
-    Vector r_nc = r_n - r_c;
-    real tmp_dist = r_nc.norm();
-    if(tmp_dist > afm_info.max_dist) return;
-    real k_afm = afm_info.k_afm;
-    real v_afm = afm_info.v_afm;
-    real force = k_afm * (tmp_dist - afm_info.tmp_dist);
-    Vector f_i = -1.0 * force * r_nc.unitvec();
-    Vector f_j = -1.0 * f_i;
-    add_to_force(i, f_i);
-    add_to_force(j, f_j);
-    afm_info.tmp_dist += v_afm*tstep;
-}
-
-const Afm_Info& get_afm_info() {
-    return afm_info;
+AfmPair AFM::apply_afm(const double& tstep, const AfmPair& afm_coors) {
+    Vec3d r_nc = afm_coors[1] - afm_coors[0];
+    double tmp_dist = r_nc.norm();
+    if(tmp_dist > _afm_config.max_dist)
+        return AfmPair{Vec3d(0, 0, 0), Vec3d(0, 0, 0)};
+    double k_afm = _afm_config.k_afm;
+    double v_afm = _afm_config.v_afm;
+    double force = k_afm * (tmp_dist - _afm_config.tmp_dist);
+    Vec3d f_i = -1.0 * force * r_nc.unitvec();
+    Vec3d f_j = -1.0 * f_i;
+    _afm_config.tmp_dist += v_afm*tstep;
+    return AfmPair {f_i, f_j};
 }
