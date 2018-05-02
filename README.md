@@ -25,6 +25,18 @@ The displacement propagation of the system is obtained by solving the following 
 - Generate paramter files using gen-top, then run dynamics with main-prog.
 - All the files (`crd`, `psf`, `dcd`, `prm` and `rtf`) generated will be compatible with CHARMM package for further analysis.
 - Program currently under testing and debugging. 
-- A short demo of ubiquitin AFM-like pulling is provided:
+- 3 short demos of ubiquitin are provided:
 
-<img src="https://github.com/wangqi1990uc/ez-afm/blob/master/afm-demo.gif" width="50%" height="50%" />
+1. Short equilibration
+<img src="https://github.com/wangqi1990uc/ez-afm/blob/master/equil.gif" width="50%" height="50%" />
+
+2. AFM-like pulling with N terminal fixed
+<img src="https://github.com/wangqi1990uc/ez-afm/blob/master/fixed.gif" width="50%" height="50%" />
+
+3. AFM-like pulling with out fixing any atom
+<img src="https://github.com/wangqi1990uc/ez-afm/blob/master/free.gif" width="50%" height="50%" />
+
+
+## TODO
+- [ ] better user variable handling
+- [ ] Add hydrodynamic interation tensor
