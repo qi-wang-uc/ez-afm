@@ -12,23 +12,21 @@ set outfreq  = 100 	   ! <10> frequency to write energy info and .afm files.
 set dcdfreq  = 10	   ! <10> frequency to write coordinate
 set nbdfreq  = 10	   ! <10> frequency to update nonbonded list
 set dijfreq  = 10	   ! <10> frequency to update diffusion tensor, will be ignored when "hydro" is set to "none".
-set hydro    = none	   ! <none> hydrodynamics [cholesky], [tea], or [none]
+set hydro    = none	   ! <none> hydrodynamics [cholesky], [tea], or [none], currently not implemented
 
 ! Read toppar and coordinate into system
 system prm	@{protname}.prm
 system psf	@{protname}.psf
 system cor	@{protname}.cor
 ! fix atom index
-!system fix  1
+system fix  1
 
 ! AFM setup
-!afm nterm 1 cterm 76 force 2 velocity 0.000001 maxdist 280 afmfile @{protname}.afm
+afm nterm 1 cterm 76 force 2 velocity 0.000001 maxdist 280
 
 ! Run dynamics
-! Use -1 to turn off energy check (absolute energy difference between adjacent steps).
-! Use -1 as corname or dcdname to turn off saving coordinate or trajectory. 
 dyna hydro @{hydro} nstep @{nstep} tstep @{tstep} temp @{temp} zeta @{zeta} -
      dcdfreq @{dcdfreq} nbdfreq @{nbdfreq} outfreq @{outfreq} dijfreq @{dijfreq} - 
-     echeck -1 dcdname @{protname}.dcd
+     dcdname @{protname}.dcd
 
 stop
