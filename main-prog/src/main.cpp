@@ -7,7 +7,7 @@
 int main(int argc, char* argv[]) {
 	std::ios_base::sync_with_stdio(false);
 	std::cout << std::endl
-			  << "EZAFM> Easy Atomic Force Miscroscopy Simulations (v2.0)" 
+                  << "EZAFM> Easy Atomic Force Miscroscopy Simulations (v2.0)" 
 	          << std::endl;
 	if(argc < 2) return 1;
 	
@@ -22,8 +22,8 @@ int main(int argc, char* argv[]) {
 		return 1;
 	else
 		std::cout << std::endl 
-                  << "EZAFM> Normal termination of program." 
-				  << std::endl;
+                          << "EZAFM> Normal termination of program." 
+                          << std::endl;
 	auto tock = TimeStamp::now();
 	time_elapsed(tick, tock);
 
