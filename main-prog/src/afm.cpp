@@ -15,8 +15,8 @@ void AFM::setup_afm(std::vector<std::string> cmds, UserVar& user_var) {
     std::cout << "PrepAFM> The following parameters will be used:" << std::endl;
     for(auto it_afm=afm_opt.begin();it_afm!=afm_opt.end(); it_afm++) {
             std::cout << std::left 
-                  << std::setw(10) << it_afm->first  << " = " 
-                  << std::setw(10) << it_afm->second << std::endl;
+                      << std::setw(10) << it_afm->first  << " = " 
+                      << std::setw(10) << it_afm->second << std::endl;
     }
     /* afm initialization */
     this->_afm_config.do_afm = true;
