@@ -25,6 +25,9 @@ void AFM::setup_afm(std::vector<std::string> cmds, UserVar& user_var) {
     this->_afm_config.k_afm  = std::stof(afm_opt["force"]);
     this->_afm_config.v_afm  = std::stof(afm_opt["velocity"]);
     this->_afm_config.max_dist = std::stof(afm_opt["maxdist"]);
+    std::cout << "AfmTitle> "
+              << std::setw(16) << "Force"
+              << std::setw(16) << "Distance" << std::endl;
 }
 
 AfmPair AFM::apply_afm(const double& tstep, const AfmPair& afm_coors) {
@@ -38,5 +41,9 @@ AfmPair AFM::apply_afm(const double& tstep, const AfmPair& afm_coors) {
     Vec3d f_i = -1.0 * force * r_nc.unitvec();
     Vec3d f_j = -1.0 * f_i;
     _afm_config.tmp_dist += v_afm*tstep;
+    std::cout << "AfmInfo> " << std::fixed 
+              << std::setw(16) << std::setprecision(6) << f_i.norm() 
+              << std::setprecision(6) << std::setw(16) << tmp_dist 
+              << std::endl;
     return AfmPair {f_i, f_j};
 }
