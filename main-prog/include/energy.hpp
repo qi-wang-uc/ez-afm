@@ -43,9 +43,9 @@ class Energy : public PsfData, public CorData, public PrmData {
 
 template<typename T>
 void Energy::other_forces(const std::vector<size_t>& coor_set, const T& force_set) {
+    if (coor_set.size()!=force_set.size()) return;
     auto it_coor  = coor_set.begin();
     auto it_force = force_set.begin();
-    if (coor_set.size()!=force_set.size()) return;
     for(; it_coor!=coor_set.end()&&it_force!=force_set.end(); it_coor++, it_force++)
         this->apply_force(*it_coor, *it_force);
 }
