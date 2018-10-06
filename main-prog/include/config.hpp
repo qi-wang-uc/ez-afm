@@ -10,7 +10,7 @@ class Config {
     private:    
         CMDs _config;
     public:
-        bool read_config(const std::string& inp_name);
+        bool read_config(const Str& inp_name);
         bool exec_config(void);
 };
 

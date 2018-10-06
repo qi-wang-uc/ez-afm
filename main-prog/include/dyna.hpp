@@ -3,6 +3,7 @@
 
 #include <vector>
 #include <string>
+#include "define.hpp"
 #include "energy.hpp"
 #include "rand.hpp"
 #include "afm.hpp"
@@ -10,25 +11,41 @@
 #include "uservar.hpp"
 
 struct DynaConfig {
-    double tstep   = 1;
-    double zeta    = 50;
-    double temp    = 300;            
-    size_t nstep   = 1000;
-    size_t outfreq = 100; 
-    size_t dcdfreq = 100; 
-    size_t nbdfreq = 100; 
-    size_t dijfreq = 100; 
-    size_t resisep = 100; 
-    size_t qhydro  = 0;
-    std::string dcdname = "default";
+    Real tstep   = 1;
+    Real zeta    = 50;
+    Real temp    = 300;            
+    Int  nstep   = 1000;
+    Int  outfreq = 100; 
+    Int  dcdfreq = 100;
+    Int  nbdfreq = 100; 
+    Int  dijfreq = 100; 
+    // Int  qhydro  = 0;
+    Str  dcdname = "";
+    DynaConfig() {}
+    DynaConfig(Real tstep, Real zeta, Real temp, 
+            Int nstep, Int outfreq, Int dcdfreq, Int nbdfreq, Int dijfreq, 
+            Str dcdname) :
+        tstep(tstep), zeta(zeta), temp(temp),nstep(nstep),
+            outfreq(outfreq), dcdfreq(dcdfreq), nbdfreq(nbdfreq), dijfreq(dijfreq),
+            dcdname(dcdname) {}
 };
 
-class DynaSystem : public Energy, public Rand, public DcdData, public AFM {
-    protected:
+class DynaSystem {
+    private:
         DynaConfig _dyna_config;
     public:
-        void setup_dyna(std::vector<std::string> cmds, UserVar& user_var);
+        PsfData psf;
+        PrmData prm;
+        CorData cor;
+        DcdData dcd;
+        Energy ener;
+        Rand   rand;
+        AFM     afm;
+        void set_dynaconfig(DynaConfig&& inp_config);
+        void setup_dyna(StrVec cmds, UserVar& user_var);
         void run_dyna();
 };
+
+void print_nonbond(Int istep, Int nonbonds, Int out_freq);
 
 #endif

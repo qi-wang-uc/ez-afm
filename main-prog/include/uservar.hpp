@@ -5,15 +5,15 @@
 #include <string>
 #include <vector>
 #include <map>
+#include "define.hpp"
 
-// Not supposed to be inherited.
 class UserVar {
     private:
-        std::map<std::string,std::string> _table;
+        StrTable _table;
     public:
         void print(void);
-        void update(std::vector<std::string> cmds);
-        std::string query(std::string& name) const;
+        void update(StrVec cmds);
+        Str  query(Str& name) const;
         
 };
 
