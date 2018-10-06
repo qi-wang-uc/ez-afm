@@ -9,17 +9,15 @@
 #include "../include/psf.hpp"
 #include "../include/util.hpp"
 
-bool PsfData::read_psf(const std::string& inp_name) {
+bool PsfData::read_psf(const Str& inp_name) {
 	std::ifstream inp_file(inp_name);
 	if(!inp_file.is_open()) {
-		std::cout << "ERROR> Cannot open file [" << inp_name << "]"
-		          << std::endl;
+		std::cout << "ERROR> Cannot open file: "  << inp_name << std::endl;
 		return false;
 	} else {
-		std::cout << "ReadPSF> Reading PSF information from [" << inp_name << "]" 
-		          << std::endl;
+		std::cout << "ReadPSF> Reading PSF information from: " << inp_name << std::endl;
 	}
-	std::string each_line;
+	Str each_line;
 	std::stringstream each_stream;
 	
 	bool is_reading_atom = false;
@@ -32,8 +30,8 @@ bool PsfData::read_psf(const std::string& inp_name) {
 	max_lines = CEIL(maPsfAtomx_members / members_per_line); where members_per_line for
 	NATOM, NBOND, NTHETA(NANGLE) and NPHI(NDIHEDRAL) are 1, 4, 3, 2, respectively.
 	*/
-	size_t max_members;
-	size_t max_lines;
+	Int max_members;
+	Int max_lines;
 	while(std::getline(inp_file, each_line)) {
 		each_stream.str(each_line);
 		if(each_line.empty()) continue;
@@ -84,8 +82,8 @@ bool PsfData::read_psf(const std::string& inp_name) {
 	return true;
 }
 
-void PsfData::set_PsfAtom(const std::string& inp_data, const size_t& max_lines) {
-	static size_t counter = 0;
+void PsfData::set_PsfAtom(const Str& inp_data, const Int& max_lines) {
+	static Int counter = 0;
 	if(counter > max_lines) return;
 	PsfAtom tmp_psf_atom;
 	std::stringstream inp_stream(inp_data);
@@ -104,14 +102,14 @@ void PsfData::set_PsfAtom(const std::string& inp_data, const size_t& max_lines) 
 	counter++;
 }
 
-void PsfData::set_PsfBond(const std::string &inp_data, const size_t& max_lines) {
-	static size_t counter = 0;
+void PsfData::set_PsfBond(const Str &inp_data, const Int& max_lines) {
+	static Int counter = 0;
 	if(counter > max_lines) 
 		return;
 	std::stringstream inp_stream(inp_data);
-	size_t n_loop = n_of_words(inp_data)/2;
+	Int n_loop = n_of_words(inp_data)/2;
 	n_loop = (n_loop==NUM_ENTRY_BOND) ? NUM_ENTRY_BOND : n_loop;
-	for(size_t i=0; i<n_loop; ++i) {
+	for(Int i=0; i<n_loop; ++i) {
 		PsfBond tmp_psf_bond;
         inp_stream >> tmp_psf_bond.atom_i 
                    >> tmp_psf_bond.atom_j;
@@ -120,14 +118,14 @@ void PsfData::set_PsfBond(const std::string &inp_data, const size_t& max_lines) 
 	counter++;	
 }
 
-void PsfData::set_PsfAngle(const std::string &inp_data, const size_t& max_lines) {
-	static size_t counter = 0;
+void PsfData::set_PsfAngle(const Str &inp_data, const Int& max_lines) {
+	static Int counter = 0;
 	if(counter > max_lines) 
 		return;
 	std::stringstream inp_stream(inp_data);
-	size_t n_loop = n_of_words(inp_data)/3;
+	Int n_loop = n_of_words(inp_data)/3;
 	n_loop = (n_loop==NUM_ENTRY_ANGLE) ? NUM_ENTRY_ANGLE : n_loop;
-	for(size_t i=0; i<n_loop; ++i) {
+	for(Int i=0; i<n_loop; ++i) {
 		PsfAngle tmp_psf_angle;
 		inp_stream >> tmp_psf_angle.atom_i 
                    >> tmp_psf_angle.atom_j 
@@ -137,14 +135,14 @@ void PsfData::set_PsfAngle(const std::string &inp_data, const size_t& max_lines)
 	counter++;
 }
 
-void PsfData::set_PsfDihedral(const std::string &inp_data, const size_t& max_lines) {
-	static size_t counter = 0;
+void PsfData::set_PsfDihedral(const Str &inp_data, const Int& max_lines) {
+	static Int counter = 0;
 	if(counter > max_lines)
 		return;
 	std::stringstream inp_stream(inp_data);
-	size_t n_loop = n_of_words(inp_data)/4;
+	Int n_loop = n_of_words(inp_data)/4;
 	n_loop = (n_loop==NUM_ENTRY_DIHEDRAL) ? NUM_ENTRY_DIHEDRAL : n_loop;
-	for(size_t i=0; i<n_loop; ++i) {
+	for(Int i=0; i<n_loop; ++i) {
 		PsfDihedral tmp_psf_dihedral;
 		inp_stream >> tmp_psf_dihedral.atom_i 
 		           >> tmp_psf_dihedral.atom_j 
@@ -155,7 +153,7 @@ void PsfData::set_PsfDihedral(const std::string &inp_data, const size_t& max_lin
 	counter++;
 }
 
-bool PsfData::set_fix_atom (const size_t& index) {
+bool PsfData::set_fix_atom (const Int& index) {
 	if((index) > this->_psf_atom.size()) {
 		std::cout << "ERROR> Requested fix-atom index (" 
 		          << index 
@@ -169,20 +167,29 @@ bool PsfData::set_fix_atom (const size_t& index) {
 	return true;
 }
 
-const std::string PsfData::get_atom_type(const size_t& query_id) const {
+const Str PsfData::get_atom_type(const Int& query_id) const {
 	return this->_psf_atom[query_id].atom_type;
 }
 
-const bool PsfData::is_movable (const size_t& index) const {
+const bool PsfData::is_movable (const Int& index) const {
 	return 0 == this->_psf_atom[index].imove;
 }
 
-const size_t PsfData::get_NATOM() const {
+const Int PsfData::get_NATOM() const {
 	return this->_NATOM;
 }
 
-size_t get_psf_section_count(std::string& inp_str) {
+Int get_psf_section_count(Str& inp_str) {
 	auto npos = inp_str.find_first_not_of("0123456789");
 	return std::stol(inp_str.substr(0,npos-1));
 }
 
+std::vector<PsfBond> const& PsfData::get_bond() const {
+	return this->_psf_bond;
+}
+std::vector<PsfAngle> const& PsfData::get_angle() const {
+	return this->_psf_angle;
+}
+std::vector<PsfDihedral> const& PsfData::get_dihedral() const {
+	return this->_psf_dihedral;
+}

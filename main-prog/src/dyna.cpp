@@ -3,11 +3,17 @@
 #include <map>
 #include <fstream>
 #include <cmath>
+#include <stdlib.h>
 #include "../include/dyna.hpp"
 #include "../include/define.hpp"
 #include "../include/util.hpp"
+#include "../include/dcd.hpp"
 
-void DynaSystem::setup_dyna(std::vector<std::string> cmds, UserVar& user_var) {
+void DynaSystem::set_dynaconfig(DynaConfig&& inp_config) {
+    this->_dyna_config = std::move(inp_config);
+}
+
+void DynaSystem::setup_dyna(StrVec cmds, UserVar& user_var) {
     std::cout << "DynaSetup> Preparing for dynamics simulation" << std::endl;
     std::map<std::string,std::string> dyna_opt;
     for(auto it_cmd=cmds.begin()+1; it_cmd!=cmds.end(); it_cmd+=2) {
@@ -16,107 +22,112 @@ void DynaSystem::setup_dyna(std::vector<std::string> cmds, UserVar& user_var) {
     }
     std::cout << "DynaSetup> The following parameters will be used:" << std::endl;
     for(auto it_dyna=dyna_opt.begin(); it_dyna!=dyna_opt.end(); it_dyna++) {
-        std::cout << "DynaSetup> " << std::left
-                  << std::setw(10) << it_dyna->first  << " = " 
-                  << std::setw(10) << it_dyna->second << std::endl;
+        std::cout << "DynaSetup> " 
+                  << std::left
+                  << std::setw(10) << it_dyna->first
+                  << " = " 
+                  << std::setw(10) << it_dyna->second
+                  << std::endl;
     }
     /**************** For dynamics ***********************/
-    this->_dyna_config.tstep   = std::stof(dyna_opt["tstep"]);
-    this->_dyna_config.zeta    = std::stof(dyna_opt["zeta"]);
-    this->_dyna_config.temp    = std::stof(dyna_opt["temp"]);
-    this->_dyna_config.nstep   = std::stol(dyna_opt["nstep"]);
-    this->_dyna_config.outfreq = std::stol(dyna_opt["outfreq"]);
-    this->_dyna_config.dcdfreq = std::stol(dyna_opt["dcdfreq"]);
-    this->_dyna_config.nbdfreq = std::stol(dyna_opt["nbdfreq"]);
-    this->_dyna_config.dijfreq = std::stol(dyna_opt["dijfreq"]);
-    this->_dyna_config.dcdname = dyna_opt["dcdname"];
+    this->set_dynaconfig(DynaConfig(
+        static_cast<Real>(std::stof(dyna_opt["tstep"])),
+        static_cast<Real>(std::stof(dyna_opt["zeta"])),
+        static_cast<Real>(std::stof(dyna_opt["temp"])),
+        static_cast<Int> (std::stol(dyna_opt["nstep"])),
+        static_cast<Int> (std::stol(dyna_opt["outfreq"])),
+        static_cast<Int> (std::stol(dyna_opt["dcdfreq"])),
+        static_cast<Int> (std::stol(dyna_opt["nbdfreq"])),
+        static_cast<Int> (std::stol(dyna_opt["dijfreq"])),
+        static_cast<Str> (dyna_opt["dcdname"])));
     /*****************************************************/
-    const size_t NATOM = this->get_NATOM();
+    
     /**************** For dcd header *********************/
-    this->_dcd_header.natom = NATOM;
-    this->_dcd_header.nfile = _dyna_config.nstep/_dyna_config.dcdfreq;
-    this->_dcd_header.npriv = 0;
-    this->_dcd_header.nsavc = _dyna_config.dcdfreq;
-    this->_dcd_header.nstep = _dyna_config.nstep;
-    this->_dcd_header.ifpbc = 0;
-    this->_dcd_header.delta = _dyna_config.tstep * TIMFAC;
-    this->_dcd_header.prog_title = "REMARK CREATED BY EZAFM FILENAME";
-    this->_dcd_header.user_title = "REMARK CREATED BY EZAFM USER";
+    this->dcd.set_dcdheader(DCD_Header(
+        static_cast<int32_t>(this->psf.get_NATOM()), 
+        static_cast<int32_t>(this->_dyna_config.nstep/this->_dyna_config.dcdfreq), 
+        static_cast<int32_t>(0), 
+        static_cast<int32_t>(this->_dyna_config.dcdfreq), 
+        static_cast<int32_t>(this->_dyna_config.nstep), 
+        static_cast<int32_t>(0), 
+        static_cast<float>(this->_dyna_config.tstep * TIMFAC),
+        static_cast<const char*>(("REMARK CREATED AT " + time_stamp()).c_str()), 
+        static_cast<const char*>(("REMARK CREATED BY " + Str(getenv("USER"))).c_str())));
     /*****************************************************/
     /* initialize random number array and run dynamics. */
-    this->init_rand(NATOM);
-    this->init_energy(NATOM);
+    const Int NATOM = this->psf.get_NATOM();
+    this->rand.init_rand(NATOM);
+    this->ener.init_energy(NATOM);
     //if(qhydro) init_tensor(NATOM);
 }
 
 void DynaSystem::run_dyna() {
-    std::cout << "DynaRun> Running dynamics for (" << _dyna_config.nstep 
-              << ") steps ..." << std::endl; 
+    std::cout << "DynaRun> Running dynamics for " 
+              << int2str(this->_dyna_config.nstep)
+              << " steps ..."
+              << std::endl; 
     /* coefficients for dispalcement calculation*/
-    const size_t NATOM = this->get_NATOM();
-    const double DELTA = _dyna_config.tstep * TIMFAC;
-    const double kT = KB * _dyna_config.temp;
-    const double ZETA = _dyna_config.zeta;
-    const double VAR = sqrt(2*kT*ZETA/DELTA);
-    const double COEFF = DELTA / ZETA;
-    const double RCUT  = 16.0;
+    const Int  NATOM = this->psf.get_NATOM();
+    const Real DELTA = this->_dyna_config.tstep * TIMFAC;
+    const Real kT    = this->_dyna_config.temp * KB;
+    const Real ZETA  = this->_dyna_config.zeta;
+    const Real VAR   = sqrt(2*kT*ZETA/DELTA);
+    const Real COEFF = DELTA / ZETA;
+    const Real RCUT  = 16.0;
     /* initialize trajectory writing */
-    std::ofstream dcd_file(_dyna_config.dcdname, std::ios::binary);
-    this->write_dcdheader(dcd_file);
+    std::ofstream dcd_file(this->_dyna_config.dcdname, std::ios::binary);
+    this->dcd.write_dcdheader(dcd_file);
     /* run dynamics */
-    size_t istep = 1;
-    this->update_nonbond(RCUT);
-    this->print_energy(istep, 1==istep);
-    
-    while(istep <= _dyna_config.nstep) {
-        
+    Int istep = 1;
+    this->ener.update_nonbond(RCUT, this->cor);
+    this->ener.print_energy(istep, 1==istep);
+
+    while(istep <= this->_dyna_config.nstep) {
         /* 0. update nonbonded interaction pair list */
-        if(0==istep%_dyna_config.nbdfreq) {
-            auto n_pairs = this->update_nonbond(RCUT);
-            if(0==istep%_dyna_config.outfreq) {
-                std::cout << "NonBond> Nonbonded pair list update (" 
-                          << n_pairs << ") found in step (" 
-                          << istep << ")" <<std::endl;
-            }
-                
+        if(0==istep%this->_dyna_config.nbdfreq) {
+            auto n_pairs = this->ener.update_nonbond(RCUT, this->cor);
+            print_nonbond(istep, n_pairs, this->_dyna_config.outfreq);    
         }
-        
         /* 1. fill the random number array */
-        this->gen_rand(0.0, VAR);
-        
+        this->rand.gen_rand(0.0, VAR);
         /* 2. calculate gradients */
-        this->compute_energy();
-        
+        this->ener.compute_energy(this->psf, this->prm, this->cor);
         /* 3. if AFM: internal energy must be calculated before this step */
-        if(_afm_config.do_afm) {
-            size_t index_n = _afm_config.nterm-1;
-            size_t index_c = _afm_config.cterm-1;
-            auto afm_coors = AfmPair {get_atom_coor(index_n), get_atom_coor(index_c)};
-            auto afm_forces = apply_afm(_dyna_config.tstep, afm_coors);
-            auto afm_atoms = std::vector<size_t> {index_n, index_c};
-            this->other_forces<std::array<Vec3d,2> >(afm_atoms, afm_forces);
+        if(this->afm.get_config().do_afm) {
+            Int index_n = this->afm.get_config().nterm-1;
+            Int index_c = this->afm.get_config().cterm-1;
+            auto afm_coors = AfmPair {this->cor.get_atom_coor(index_n), this->cor.get_atom_coor(index_c)};
+            auto afm_forces = this->afm.apply_afm(_dyna_config.tstep, afm_coors);
+            auto afm_atoms = std::vector<Int> {index_n, index_c};
+            this->ener.other_forces<std::array<Vec3d,2> >(afm_atoms, afm_forces);
         }
-        
         /* 4. At this point all force calculations are done. */
-        if(0==istep%_dyna_config.outfreq)
-            this->print_energy(istep, 1==istep);
-        
+        if(0==istep%this->_dyna_config.outfreq)
+            this->ener.print_energy(istep, 1==istep);
         /* 5. calculate diffusion tensor (if necessary) */
         // if(0==istep%dijfreq)
         
         /* 6. apply displacement propagation */
-        for(size_t iatom=0; iatom < NATOM; ++iatom) {
-            auto tmp_rand  = get_rand(iatom);
-            auto tmp_force = get_force(iatom);
+        for(Int iatom=0; iatom < NATOM; ++iatom) {
+            auto tmp_rand  = this->rand.get_rand(iatom);
+            auto tmp_force = this->ener.get_force(iatom);
             auto dr = COEFF*(tmp_force + tmp_rand);
-            if(is_movable(iatom))
-                this->move_cor(dr, iatom);
+            this->cor.move_cor(dr, iatom, psf.is_movable(iatom));
         }
-        
         /* 7. write coordinate to trajectory */
         if(0==istep%_dyna_config.dcdfreq)
-            this->write_dcdframe(dcd_file, p_xcoor(), p_ycoor(), p_zcoor(), NATOM);
+            this->dcd.write_dcdframe(dcd_file, this->cor.p_xcoor(), this->cor.p_ycoor(), this->cor.p_zcoor(), NATOM);
         istep++;
     }
     dcd_file.close();
+}
+
+void print_nonbond(Int istep, Int n_pairs, Int out_freq) {
+    if(0==istep%out_freq) {
+        std::cout << "NonBond> Nonbonded pair list update " 
+                  << int2str(n_pairs)
+                  << " found in step " 
+                  << int2str(istep)
+                  << std::endl;
+    }
 }

@@ -4,6 +4,10 @@
 #include <algorithm>
 #include "../include/dcd.hpp"
 
+void DcdData::set_dcdheader(DCD_Header&& inp_header) {
+    this->_dcd_header = std::move(inp_header);
+}
+
 void DcdData::write_dcdheader(std::ofstream& dcd_file) {
     /* dcd header part 1. */
     dcd_file.write(reinterpret_cast<const char*>(&this->_dcd_pads.pad84), 4);
@@ -31,7 +35,7 @@ void DcdData::write_dcdheader(std::ofstream& dcd_file) {
     dcd_file.write(reinterpret_cast<const char*>(&this->_dcd_pads.pad4), 4);
 }
 
-void DcdData::write_dcdframe(std::ofstream& dcd_file, const float* fX, const float* fY, const float* fZ, const size_t& natom) {
+void DcdData::write_dcdframe(std::ofstream& dcd_file, const float* fX, const float* fY, const float* fZ, const Int& natom) {
     const int32_t pad4N = 4*natom;
     /* write x coordinates. */
     dcd_file.write(reinterpret_cast<const char*>(&pad4N), 4);

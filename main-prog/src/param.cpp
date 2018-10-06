@@ -17,8 +17,9 @@ bool PrmData::read_prm(const std::string &inp_name) {
 		std::cout << "ERROR> File not found!" << std::endl;
 		return false;
 	} else {
-		std::cout << "ReadPRM> Reading energy parameters from file ["
-			<< inp_name << "]" << std::endl;
+		std::cout << "ReadPRM> Reading energy parameters from file: "
+			      << inp_name
+			      << std::endl;
 	}
 	/* 
 	Flags to determine which container the buffer should go to.
@@ -38,11 +39,11 @@ bool PrmData::read_prm(const std::string &inp_name) {
 	bool is_reading_vdw   = false;
 	bool is_reading_nbfix = false;
 	/* Container for buffer streams of each energy term */
-	std::vector<std::string> buffer_bond;
-	std::vector<std::string> buffer_angle;
-	std::vector<std::string> buffer_dihedral;
-	std::vector<std::string> buffer_vdw;
-	std::vector<std::string> buffer_nbfix;
+	StrVec buffer_bond;
+	StrVec buffer_angle;
+	StrVec buffer_dihedral;
+	StrVec buffer_vdw;
+	StrVec buffer_nbfix;
 	/* Now read the parameter file */
 	std::string each_line;
 	while(std::getline(inp_file, each_line)) {
@@ -100,11 +101,11 @@ bool PrmData::read_prm(const std::string &inp_name) {
 	return true;
 }
 
-void PrmData::parse_PrmBond(const std::vector<std::string> &inp_data) {
-	std::string i;
-	std::string j;
-	double k;
-	double r;
+void PrmData::parse_PrmBond(const StrVec& inp_data) {
+	Str i;
+	Str j;
+	Real k;
+	Real r;
 	std::stringstream inp_stream;
 	for(auto it=inp_data.cbegin();it!=inp_data.cend();++it) {
 		inp_stream.str(*it);
@@ -114,12 +115,12 @@ void PrmData::parse_PrmBond(const std::vector<std::string> &inp_data) {
 	}
 }
 
-void PrmData::parse_PrmAngle(const std::vector<std::string> &inp_data) {
-	std::string i;
-	std::string j;
-	std::string k;
-	double k_angle;
-	double theta_eq;
+void PrmData::parse_PrmAngle(const StrVec& inp_data) {
+	Str i;
+	Str j;
+	Str k;
+	Real k_angle;
+	Real theta_eq;
 	std::stringstream inp_stream;
 	for(auto it=inp_data.cbegin();it!=inp_data.cend();++it) {
 		inp_stream.str(*it);
@@ -129,13 +130,13 @@ void PrmData::parse_PrmAngle(const std::vector<std::string> &inp_data) {
 	}
 }
 
-void PrmData::parse_PrmDihedral(const std::vector<std::string> &inp_data) {
-	std::string i;
-	std::string j;
-	std::string k;
-	std::string l;
-	double f;	// force constant
-	double d;	// delta
+void PrmData::parse_PrmDihedral(const StrVec& inp_data) {
+	Str i;
+	Str j;
+	Str k;
+	Str l;
+	Real f;	// force constant
+	Real d;	// delta
 	unsigned short m;	// multiplicity
 	std::stringstream inp_stream;
 	for(auto it=inp_data.cbegin();it!=inp_data.cend();++it) {
@@ -154,10 +155,10 @@ void PrmData::parse_PrmDihedral(const std::vector<std::string> &inp_data) {
 }
 
 void PrmData::parse_PrmVdw(const std::vector<std::string> &inp_data) {
-	std::string i;
-	double d;
-	double eps;
-	double em;
+	Str  i;
+	Real d;
+	Real eps;
+	Real em;
 	std::stringstream inp_stream;
 	for(auto it=inp_data.cbegin();it!=inp_data.cend();++it) {
 		inp_stream.str(*it);
@@ -168,12 +169,12 @@ void PrmData::parse_PrmVdw(const std::vector<std::string> &inp_data) {
 }
 
 void PrmData::parse_PrmNbfix(const std::vector<std::string> &inp_data) {
-	std::string i;
-	std::string j;
-	double e;
-	double s;
-	double c;
-	double d;
+	Str  i;
+	Str  j;
+	Real e;
+	Real s;
+	Real c;
+	Real d;
 	std::stringstream inp_stream;
 
 	for(auto it=inp_data.cbegin();it!=inp_data.cend();++it) {

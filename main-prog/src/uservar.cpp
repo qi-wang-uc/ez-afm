@@ -22,9 +22,9 @@ void UserVar::update(std::vector<std::string> cmds) {
 	this->_table[cmds[1]] = ("="==cmds[2]) ? cmds[3]:cmds[2];
 }
 
-std::string UserVar::query(std::string& name) const {
-    std::string invalid_query = "";
-    std::cout << "UserVar> Retriving (" << name << ")" << std::endl;
+Str UserVar::query(Str& name) const {
+    Str invalid_query = "";
+    std::cout << "UserVar> Retriving " << name << std::endl;
     while(name.find("@")!=std::string::npos) {
         auto var_begin = name.find_first_of("@");
         auto val_begin = var_begin + 2;
@@ -32,11 +32,12 @@ std::string UserVar::query(std::string& name) const {
         auto right_brace = name.find_first_of("}");
         auto len_of_val = right_brace - left_brace - 1;
         auto len_of_var = len_of_val + 3;
-        std::string var = name.substr(var_begin, len_of_var);
-        std::string val = name.substr(val_begin, len_of_val);
+        Str var = name.substr(var_begin, len_of_var);
+        Str val = name.substr(val_begin, len_of_val);
         if(this->_table.find(val)==this->_table.end()) {
-            std::cout << "ERROR> Cannot find (" << val 
-                      << ") in user defined variables." 
+            std::cout << "ERROR> Cannot find " 
+                      << val 
+                      << " in user defined variables." 
                       << std::endl;
             return invalid_query;
         }

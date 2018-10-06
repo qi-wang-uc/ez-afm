@@ -17,12 +17,14 @@ bool CorData::read_cor(const std::string &inp_name) {
 	std::ifstream inp_file(inp_name);
 	this->_sizeof_coor = 0;
 	if(!inp_file.is_open()) {
-		std::cout << "ERROR> Could not open file [" << inp_name << "]" 
-                  << std::endl;
+		std::cout << "ERROR> Could not open file: " 
+		          << inp_name 
+				  << std::endl;
 		return false;
 	} else {
-		std::cout << "ReadCOR> Reading coordinate file from [" << inp_name << "]"
-                  << std::endl; 
+		std::cout << "ReadCOR> Reading coordinate file from: " 
+		          << inp_name 
+				  << std::endl; 
 	}
 	std::string each_line;
 	std::stringstream each_stream;
@@ -54,15 +56,19 @@ bool CorData::read_cor(const std::string &inp_name) {
 		each_stream.clear();
 	}
 	inp_file.close();
-	std::cout << "ReadCOR> After reading, (" << this->_sizeof_coor
-              << ") atoms found in coordinate file." << std::endl;
+	std::cout << "ReadCOR> After reading, " 
+	          << int2str(this->_sizeof_coor)
+              << " atoms found in coordinate file." 
+			  << std::endl;
 	return true;
 }
 
-void CorData::move_cor(Vec3d& dr, const size_t& atomid) {
-	this->_xcoor.at(atomid) += dr.x;
-	this->_ycoor.at(atomid) += dr.y;
-	this->_zcoor.at(atomid) += dr.z;
+void CorData::move_cor(Vec3d& dr, const Int& atomid, bool is_movable) {
+	if (is_movable) {
+		this->_xcoor.at(atomid) += dr.x;
+		this->_ycoor.at(atomid) += dr.y;
+		this->_zcoor.at(atomid) += dr.z;
+	}
 }
 
 const float* CorData::p_xcoor(void) {
@@ -77,14 +83,18 @@ const float* CorData::p_zcoor(void) {
 	return this->_zcoor.data();
 }
 
-const Vec3d CorData::get_atom_coor(const size_t& atomid) const {
+const Vec3d CorData::get_atom_coor(const Int& atomid) const {
 	return Vec3d(static_cast<double>(this->_xcoor.at(atomid)),
                  static_cast<double>(this->_ycoor.at(atomid)),
                  static_cast<double>(this->_zcoor.at(atomid)));
 }
 
+Int CorData::get_coorsize() const {
+	return this->_sizeof_coor;
+}
+
 void CorData::print(void) const {
-	for(size_t i=0; i<this->_sizeof_coor; ++i) {
+	for(Int i=0; i<this->_sizeof_coor; ++i) {
 		std::cout << std::setw(8)  << i+1
 				  << std::setw(12) << this->_xcoor.at(i)
 				  << std::setw(12) << this->_ycoor.at(i)
