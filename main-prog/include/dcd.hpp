@@ -4,6 +4,7 @@
 #include <string>
 #include <fstream>
 #include "define.hpp"
+
 /* dcd_trajectory_file = dcd_header + dcd_pads + dcd_coordinates */
 
 struct DCD_Header {

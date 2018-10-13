@@ -39,6 +39,9 @@ class Energy {
         // getter
         void   print_energy(const Int& istep, const bool& is_header) const;
         Vec3d  get_force(const Int& atomid) const;
+        const Real* px() const;
+        const Real* py() const;
+        const Real* pz() const;
 };
 
 template<typename T>

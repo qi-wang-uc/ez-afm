@@ -3,6 +3,7 @@
 
 #include <string>
 #include <vector>
+#include "define.hpp"
 
 using CMDs = std::vector<std::vector<std::string> >;
 

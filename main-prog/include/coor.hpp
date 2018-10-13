@@ -18,9 +18,9 @@ class CorData {
         // getter
         const Vec3d get_atom_coor(const Int& atomid) const;
         // getter of pointer for writing dcd
-        const float* p_xcoor(void);
-        const float* p_ycoor(void);
-        const float* p_zcoor(void);
+        float* px(void);
+        float* py(void);
+        float* pz(void);
         void print(void) const;
         Int get_coorsize() const;
 };

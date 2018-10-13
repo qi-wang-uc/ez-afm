@@ -34,6 +34,9 @@ Str time_stamp();
 
 void debug(Int code);
 
-Str int2str(Int integer);
+template<typename T>
+Str encap(T input) {
+    return "(" + std::to_string(input) + ")";
+}
 
 #endif

@@ -4,10 +4,6 @@
 #include <vector>
 #include "define.hpp"
 
-/*******************************************************************
-               GAUSSIAN RANDOM NUMBER DATA 
-*******************************************************************/
-
 class Rand {
     private:
         // data
@@ -18,10 +14,14 @@ class Rand {
     public:
         // setter
         void  init_rand(const Int& natom);
+        void  init_randw(const Int& size);
         void  gen_rand(const Real& mean, const Real& dev);
         // getter
         Vec3d get_rand(const Int& atomid) const;
         void  print_rand(void) const;
+        const Real* px() const;
+        const Real* py() const;
+        const Real* pz() const;
 };
 
 #endif

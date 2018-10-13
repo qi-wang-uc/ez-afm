@@ -6,27 +6,90 @@
 #include <cmath>
 #include <map>
 
-using Int  = int64_t;
+using Int  = size_t;
 using Str  = std::string;
 using Real = double;
 using StrVec  = std::vector<std::string>;
 using IntVec  = std::vector<Int>;
 using RealVec = std::vector<Real>;
 using StrTable = std::map<std::string,std::string>;
+using RealMat = std::vector<std::vector<Real>>;
 
 /********************************************/
-const Int RESISEP  = 3;              // Residue separation to determine nonbonded pairs.
-const Real DEG2RAD = 0.0174533;      // Degree to radian
-const Real KB      = 0.00198993;     // Boltzman constant
-const Real TIMFAC  = 4.88882129e-02; // Convert AKMA time unit to picosecond.
-const Real FCONV   = 69.478508;      // Converts forces from (kcal/mol)/A to pN
+const Int RESISEP  = 3;         // Residue separation to determine nonbonded pairs.
+const Real DEG2RAD = 0.0174533; // Degree to radian
+const Real KB      = 0.0019899; // Boltzman constant
+const Real TIMFAC  = 0.0488882; // Convert AKMA time unit to picosecond.
+const Real FCONV   = 69.478508; // Converts forces from (kcal/mol)/A to pN
+const Real ROOMKBT = 0.5961573; // energy at room temperature (300K) in kcal/mol
 /********************************************/
+
+struct Mat3x3 {
+    Real xx; Real xy; Real xz;
+    Real yx; Real yy; Real yz;
+    Real zx; Real zy; Real zz;
+
+    Mat3x3() {}
+    Mat3x3(Real k) :
+        xx(k),xy(k),xz(k),yx(k),yy(k),yz(k),zx(k),zy(k),zz(k) {}
+    Mat3x3(Real xx, Real xy, Real xz, Real yx, Real yy, Real yz, Real zx, Real zy, Real zz):
+        xx(xx),xy(xy),xz(xz),yx(yx),yy(yy),yz(yz),zx(zx),zy(zy),zz(zz) {}
+
+    /* scalar algebra */
+    friend Mat3x3 operator * (const Real& fact, const Mat3x3& mat) {
+        return Mat3x3(mat.xx*fact, mat.xy*fact, mat.xz*fact,
+                      mat.yx*fact, mat.yy*fact, mat.yz*fact,
+                      mat.zx*fact, mat.zy*fact, mat.zz*fact);
+    }
+    Mat3x3& operator *= (const Real &fact) {
+        this->xx *= fact; this->xy *= fact; this->xz *= fact;
+        this->yx *= fact; this->yy *= fact; this->yz *= fact;
+        this->zx *= fact; this->zy *= fact; this->zz *= fact;
+        return *this;
+    }
+	friend Mat3x3 operator / (const Mat3x3 &mat, const Real &fact) {
+        return Mat3x3(mat.xx/fact, mat.xy/fact, mat.xz/fact,
+                      mat.yx/fact, mat.yy/fact, mat.yz/fact,
+                      mat.zx/fact, mat.zy/fact, mat.zz/fact);
+    }
+    Mat3x3& operator /= (const Real &fact) {
+        this->xx /= fact; this->xy /= fact; this->xz /= fact;
+        this->yx /= fact; this->yy /= fact; this->yz /= fact;
+        this->zx /= fact; this->zy /= fact; this->zz /= fact;
+        return *this;
+    }
+    /* Mat3x3 algebra */
+    Mat3x3& operator += (const Mat3x3& rhs) {
+        this->xx += rhs.xx; this->xy += rhs.xy; this->xz += rhs.xz;
+        this->yx += rhs.yx; this->yy += rhs.yy; this->yz += rhs.yz;
+        this->zx += rhs.zx; this->zy += rhs.zy; this->zz += rhs.zz;
+        return *this;
+    }
+    Mat3x3& operator -= (const Mat3x3& rhs) {
+        this->xx -= rhs.xx; this->xy -= rhs.xy; this->xz -= rhs.xz;
+        this->yx -= rhs.yx; this->yy -= rhs.yy; this->yz -= rhs.yz;
+        this->zx -= rhs.zx; this->zy -= rhs.zy; this->zz -= rhs.zz;
+        return *this;
+    }
+    
+    friend Mat3x3 operator + (const Mat3x3& mat1, const Mat3x3& mat2) {
+        return Mat3x3(mat1.xx+mat2.xx, mat1.xy+mat2.xy, mat1.xz+mat2.xz,
+                      mat1.yx+mat2.yx, mat1.yy+mat2.yy, mat1.yz+mat2.yz,
+                      mat1.zx+mat2.zx, mat1.zy+mat2.zy, mat1.zz+mat2.zz);
+
+    }
+    friend Mat3x3 operator - (const Mat3x3& mat1, const Mat3x3& mat2) {
+        return Mat3x3(mat1.xx-mat2.xx, mat1.xy-mat2.xy, mat1.xz-mat2.xz,
+                      mat1.yx-mat2.yx, mat1.yy-mat2.yy, mat1.yz-mat2.yz,
+                      mat1.zx-mat2.zx, mat1.zy-mat2.zy, mat1.zz-mat2.zz);
+
+    }
+    /* matrix multiplication is not used durnig simulation thus not implemented */
+};
 
 struct Vec3d {
     /* basic elements and constructor */
-    Real x;
-    Real y;
-    Real z;
+    Real x; Real y; Real z;
     Vec3d() {}
     Vec3d(Real x, Real y, Real z) : x(x), y(y), z(z) {}
     /* intrinsic properties */
@@ -59,7 +122,7 @@ struct Vec3d {
         z /= fact;
         return *this;
     }
-    /* Vec3d algebra */
+    /* vector algebra */
     Vec3d& operator += (const Vec3d &vec) {
         x += vec.x;
         y += vec.y;
@@ -83,6 +146,11 @@ struct Vec3d {
     }
     Real dot_product(const Vec3d &vec) {
         return x*vec.x + y*vec.y + z*vec.z;
+    }
+    Mat3x3 tensor_product(const Vec3d &vec) {
+        return Mat3x3(x*vec.x, x*vec.y, x*vec.z,
+                      y*vec.x, y*vec.y, y*vec.z,
+                      z*vec.x, z*vec.y, z*vec.z);
     }
 };
 
