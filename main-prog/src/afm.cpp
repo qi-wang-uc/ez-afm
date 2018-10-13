@@ -15,9 +15,10 @@ void AFM::setup_afm(StrVec cmds, UserVar& user_var) {
     }
     std::cout << "PrepAFM> The following parameters will be used:" << std::endl;
     for(auto it_afm=afm_opt.begin();it_afm!=afm_opt.end(); it_afm++) {
-            std::cout << std::left 
-                  << std::setw(10) << it_afm->first  << " = " 
-                  << std::setw(10) << it_afm->second << std::endl;
+        std::cout << std::left 
+              << std::setw(10) << it_afm->first  << " = " 
+              << std::setw(10) << it_afm->second
+              << std::endl;
     }
     /* afm initialization */
     this->_afm_config.do_afm = true;
@@ -28,7 +29,8 @@ void AFM::setup_afm(StrVec cmds, UserVar& user_var) {
     this->_afm_config.max_dist = std::stof(afm_opt["maxdist"]);
     std::cout << "AfmTitle> "
               << std::setw(16) << "Force"
-              << std::setw(16) << "Distance" << std::endl;
+              << std::setw(16) << "Distance" 
+              << std::endl;
 }
 
 AfmPair AFM::apply_afm(const Real& tstep, const AfmPair& afm_coors) {

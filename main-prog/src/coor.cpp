@@ -57,7 +57,7 @@ bool CorData::read_cor(const std::string &inp_name) {
 	}
 	inp_file.close();
 	std::cout << "ReadCOR> After reading, " 
-	          << int2str(this->_sizeof_coor)
+	          << encap(this->_sizeof_coor)
               << " atoms found in coordinate file." 
 			  << std::endl;
 	return true;
@@ -71,22 +71,22 @@ void CorData::move_cor(Vec3d& dr, const Int& atomid, bool is_movable) {
 	}
 }
 
-const float* CorData::p_xcoor(void) {
+float* CorData::px(void) {
 	return this->_xcoor.data();
 }
 
-const float* CorData::p_ycoor(void) {
+float* CorData::py(void) {
 	return this->_ycoor.data();
 }
 
-const float* CorData::p_zcoor(void) {
+float* CorData::pz(void) {
 	return this->_zcoor.data();
 }
 
 const Vec3d CorData::get_atom_coor(const Int& atomid) const {
-	return Vec3d(static_cast<double>(this->_xcoor.at(atomid)),
-                 static_cast<double>(this->_ycoor.at(atomid)),
-                 static_cast<double>(this->_zcoor.at(atomid)));
+	return Vec3d(static_cast<Real>(this->_xcoor.at(atomid)),
+                 static_cast<Real>(this->_ycoor.at(atomid)),
+                 static_cast<Real>(this->_zcoor.at(atomid)));
 }
 
 Int CorData::get_coorsize() const {

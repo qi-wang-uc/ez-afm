@@ -72,9 +72,9 @@ void time_elapsed(SysClock tick, SysClock tock) {
     auto n_minutes =  (total_seconds - n_hours*3600)/60;
     auto n_seconds =  (total_seconds - n_hours*3600 - n_minutes*60);
     std::cout << "EZAFM> Time elapsed: "
-              << "(" << n_hours   << ") HR : "
-              << "(" << n_minutes << ") MIN : "
-              << "(" << n_seconds << ") SEC" << std::endl;
+              << encap(n_hours)   << " HR : "
+              << encap(n_minutes) << " MIN : "
+              << encap(n_seconds) << " SEC" << std::endl;
 }
 
 void debug(Int code) {
@@ -87,8 +87,4 @@ Str time_stamp() {
     std::stringstream ss;
     ss << std::put_time(std::localtime(&time), "%Y-%m-%d %X");
     return ss.str();
-}
-
-Str int2str(Int integer) {
-    return "(" + std::to_string(integer) + ")";
 }

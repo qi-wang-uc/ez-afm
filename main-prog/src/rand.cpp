@@ -36,3 +36,13 @@ void Rand::print_rand(void) const {
     std::cout << "************************************" << std::endl;
 
 }
+
+const Real* Rand::px() const {
+    return this->_xrand.data();
+};
+const Real* Rand::py() const {
+    return this->_yrand.data();
+};
+const Real* Rand::pz() const {
+    return this->_zrand.data();
+};

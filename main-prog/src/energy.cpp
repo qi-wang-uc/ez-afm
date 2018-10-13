@@ -244,3 +244,12 @@ Real Energy::enonbond (const PsfData& psf, const PrmData& prm, const CorData& co
     return e_nonbond;
 }
 
+const Real* Energy::px() const {
+    return this->_xgrad.data();
+}
+const Real* Energy::py() const {
+    return this->_ygrad.data();
+}
+const Real* Energy::pz() const {
+    return this->_zgrad.data();
+}

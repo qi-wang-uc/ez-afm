@@ -42,14 +42,14 @@ bool PsfData::read_psf(const Str& inp_name) {
 		/* Turn on or off switches (boolean flags) */
 		if(each_line.find("!NATOM")!=std::string::npos) {
 			max_members = get_psf_section_count(each_line);
-			std::cout << "ReadPSF> Reading PSF ATOM (" << max_members << ")" << std::endl;
+			std::cout << "ReadPSF> Reading PSF ATOM " << encap(max_members) << std::endl;
 			max_lines = max_members;
 			is_reading_atom = true;
 			continue;
 		}
 		if(each_line.find("!NBOND")!=std::string::npos) {
 			max_members = get_psf_section_count(each_line);
-			std::cout << "ReadPSF> Reading PSF BOND (" << max_members << ")" << std::endl;
+			std::cout << "ReadPSF> Reading PSF BOND " << encap(max_members) << std::endl;
 			max_lines = max_members/4 + 1;
 			is_reading_atom = false;
 			is_reading_bond = true;
@@ -57,7 +57,7 @@ bool PsfData::read_psf(const Str& inp_name) {
 		}
 		if(each_line.find("!NTHETA")!=std::string::npos) {
 			max_members = get_psf_section_count(each_line);
-			std::cout << "ReadPSF> Reading PSF ANGLE (" << max_members << ")" << std::endl;
+			std::cout << "ReadPSF> Reading PSF ANGLE " << encap(max_members) << std::endl;
 			max_lines = max_members/3 + 1;
 			is_reading_bond = false;
 			is_reading_angle = true;
@@ -65,7 +65,7 @@ bool PsfData::read_psf(const Str& inp_name) {
 		}
 		if(each_line.find("!NPHI")!=std::string::npos) {
 			max_members = get_psf_section_count(each_line);
-			std::cout << "ReadPSF> Reading PSF DIHEDRAL (" << max_members << ")" << std::endl;
+			std::cout << "ReadPSF> Reading PSF DIHEDRAL " << encap(max_members) << std::endl;
 			max_lines = max_members/2 + 1;
 			is_reading_angle = false;
 			is_reading_dihedral = true;
@@ -154,15 +154,14 @@ void PsfData::set_PsfDihedral(const Str &inp_data, const Int& max_lines) {
 }
 
 bool PsfData::set_fix_atom (const Int& index) {
-	if((index) > this->_psf_atom.size()) {
-		std::cout << "ERROR> Requested fix-atom index (" 
-		          << index 
-                  << ") exceeds maxium atom number."
+	if(index > this->_psf_atom.size()) {
+		std::cout << "ERROR> Requested fix-atom index " 
+		          << encap(index)
+                  << " exceeds maxium atom number."
 				  << std::endl;
 		return false;
 	}
-    std::cout << "FixAtom> Atom(" << index 
-              << ") will be fixed." << std::endl;
+    std::cout << "FixAtom> Atom" << encap(index) << " will be fixed." << std::endl;
 	this->_psf_atom[index-1].imove = 1;
 	return true;
 }

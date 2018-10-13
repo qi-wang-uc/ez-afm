@@ -39,6 +39,7 @@ void DynaSystem::setup_dyna(StrVec cmds, UserVar& user_var) {
         static_cast<Int> (std::stol(dyna_opt["dcdfreq"])),
         static_cast<Int> (std::stol(dyna_opt["nbdfreq"])),
         static_cast<Int> (std::stol(dyna_opt["dijfreq"])),
+        static_cast<Int> (std::stol(dyna_opt["hydro"])),
         static_cast<Str> (dyna_opt["dcdname"])));
     /*****************************************************/
     
@@ -58,12 +59,12 @@ void DynaSystem::setup_dyna(StrVec cmds, UserVar& user_var) {
     const Int NATOM = this->psf.get_NATOM();
     this->rand.init_rand(NATOM);
     this->ener.init_energy(NATOM);
-    //if(qhydro) init_tensor(NATOM);
+    if(this->_dyna_config.hydro) this->HI.init(NATOM);
 }
 
 void DynaSystem::run_dyna() {
     std::cout << "DynaRun> Running dynamics for " 
-              << int2str(this->_dyna_config.nstep)
+              << encap(this->_dyna_config.nstep)
               << " steps ..."
               << std::endl; 
     /* coefficients for dispalcement calculation*/
@@ -81,7 +82,6 @@ void DynaSystem::run_dyna() {
     Int istep = 1;
     this->ener.update_nonbond(RCUT, this->cor);
     this->ener.print_energy(istep, 1==istep);
-
     while(istep <= this->_dyna_config.nstep) {
         /* 0. update nonbonded interaction pair list */
         if(0==istep%this->_dyna_config.nbdfreq) {
@@ -104,19 +104,30 @@ void DynaSystem::run_dyna() {
         /* 4. At this point all force calculations are done. */
         if(0==istep%this->_dyna_config.outfreq)
             this->ener.print_energy(istep, 1==istep);
-        /* 5. calculate diffusion tensor (if necessary) */
-        // if(0==istep%dijfreq)
-        
-        /* 6. apply displacement propagation */
-        for(Int iatom=0; iatom < NATOM; ++iatom) {
-            auto tmp_rand  = this->rand.get_rand(iatom);
-            auto tmp_force = this->ener.get_force(iatom);
-            auto dr = COEFF*(tmp_force + tmp_rand);
-            this->cor.move_cor(dr, iatom, psf.is_movable(iatom));
+        /* 5. Calculate displacement */
+        if(1==this->_dyna_config.hydro) {
+            if((0==istep%this->_dyna_config.dijfreq) || 1==istep) {
+                HI.build(this->cor, this->_dyna_config.zeta);
+                HI.cholesky();
+            }
+            HI.apply_disp_d(DELTA, this->psf, this->ener, this->cor);
+            HI.apply_disp_r(DELTA, this->psf, this->ener, this->cor, this->rand);
+        } else if (0==this->_dyna_config.hydro) {
+            for(Int iatom=0; iatom < NATOM; ++iatom) {
+                auto tmp_rand  = this->rand.get_rand(iatom);
+                auto tmp_force = this->ener.get_force(iatom);
+                auto dr = COEFF*(tmp_force + tmp_rand);
+                this->cor.move_cor(dr, iatom, psf.is_movable(iatom));
+            }
+        } else {
+            std::cout << "ERROR> Unknown dynamics configuration: " 
+                      << encap(this->_dyna_config.hydro)
+                      << std::endl;
+            break;
         }
         /* 7. write coordinate to trajectory */
-        if(0==istep%_dyna_config.dcdfreq)
-            this->dcd.write_dcdframe(dcd_file, this->cor.p_xcoor(), this->cor.p_ycoor(), this->cor.p_zcoor(), NATOM);
+        if(0==istep%_dyna_config.dcdfreq || 1==istep)
+            this->dcd.write_dcdframe(dcd_file, this->cor.px(), this->cor.py(), this->cor.pz(), NATOM);
         istep++;
     }
     dcd_file.close();
@@ -125,9 +136,9 @@ void DynaSystem::run_dyna() {
 void print_nonbond(Int istep, Int n_pairs, Int out_freq) {
     if(0==istep%out_freq) {
         std::cout << "NonBond> Nonbonded pair list update " 
-                  << int2str(n_pairs)
+                  << encap(n_pairs)
                   << " found in step " 
-                  << int2str(istep)
+                  << encap(istep)
                   << std::endl;
     }
 }
