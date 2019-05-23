@@ -51,12 +51,12 @@ Int n_of_words(const Str &inp_str) {
 }
 
 void skip_n_words(std::stringstream &inp_stream, Int nskip) {
-	Int counter = 0;
-	Str dummy;
-	while(counter < nskip) {
-		inp_stream >> dummy;
-		counter++;
-	}
+    Int counter = 0;
+    Str dummy;
+    while(counter < nskip) {
+        inp_stream >> dummy;
+        counter++;
+    }
 }
 
 void print_boundary(Int n) {
