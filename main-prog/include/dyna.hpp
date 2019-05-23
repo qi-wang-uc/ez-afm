@@ -14,12 +14,12 @@
 struct DynaConfig {
     Real tstep   = 1;
     Real zeta    = 50;
-    Real temp    = 300;            
+    Real temp    = 300;
     Int  nstep   = 1000;
-    Int  outfreq = 100; 
+    Int  outfreq = 100;
     Int  dcdfreq = 100;
-    Int  nbdfreq = 100; 
-    Int  dijfreq = 100; 
+    Int  nbdfreq = 100;
+    Int  dijfreq = 100;
     Int  hydro  = 0;
     Str  dcdname = "";
     DynaConfig() {}
