@@ -12,16 +12,16 @@
 /********************************************************************/
 
 struct amino {
-    int atomno;		// 1, 2, ..., n.
-    int resno;		// 1, 2, ..., n.
-    std::string res;		// A1, A2, ..., An.
-    std::string type;	// type is CA for all beads.
-    double x;
-    double y;
-    double z;
-    std::string segid;	// use [PROT] by default.
-    int resid;		// 1, 2, ..., n.
-    double w;		// 0.00000 by default.
+    int atomno;         // 1, 2, ..., n.
+    int resno;          // 1, 2, ..., n.
+    std::string res;    // A1, A2, ..., An.
+    std::string type;   // type is CA for all beads.
+    double x;           // Cartesian coordinates
+    double y;           // ...
+    double z;           // ...
+    std::string segid;  // use [PROT] by default.
+    int resid;          // 1, 2, ..., n.
+    double w;           // 0.00000 by default.
     amino(int atomno, int resno, std::string res, std::string type,
         double x, double y, double z, std::string segid, int resid, double w):
         atomno(atomno), resno(resno), res(res), type(type), x(x), y(y), z(z),
