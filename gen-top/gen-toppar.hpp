@@ -1,5 +1,5 @@
-#ifndef GENTOPPAR_H
-#define GENTOPPAR_H
+#ifndef GENTOPPAR_HPP
+#define GENTOPPAR_HPP
 
 #include <string>
 
