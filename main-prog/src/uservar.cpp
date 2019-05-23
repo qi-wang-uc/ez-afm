@@ -45,4 +45,3 @@ Str UserVar::query(Str& name) const {
     }
     return name;
 }
-
