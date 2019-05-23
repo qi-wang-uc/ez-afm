@@ -36,6 +36,41 @@ where **D** is the Ronte-Prager-Yamakawa diffusion tensor:
 
 ![equation 9](demo/eqn/eqn9.png)
 
+## Example input
+```
+!o CHARMM-like input but not exactly the same.
+!o This program does not have the 4-character rule, so make sure use the full name of keywords.
+!o Values in the triangle bracket are the default value.
+!o Use curly brackets {} to refer a variable to eliminate ambiguity such as @a and @ab.
+
+set protname = 1ubq	   ! The equal sign (=) is optional.
+set nstep    = 10000      ! <100>
+set tstep    = 1	   ! <1> timestep in ps.
+set zeta     = 50	   ! <50>	damping coefficient.
+set temp     = 298	   ! <298> temperature in Kelvin.
+set outfreq  = 100 	   ! <10> frequency to write energy info and .afm files.
+set dcdfreq  = 10	   ! <10> frequency to write coordinate
+set nbdfreq  = 10	   ! <10> frequency to update nonbonded list
+set dijfreq  = 10	   ! <10> frequency to update diffusion tensor, will be ignored when "hydro" is set to "none".
+set hydro    = none	   ! <none> hydrodynamics [cholesky], [tea], or [none], currently not implemented
+
+! Read toppar and coordinate into system
+system prm	@{protname}.prm
+system psf	@{protname}.psf
+system cor	@{protname}.cor
+! fix atom index
+system fix  1
+
+! AFM setup
+afm nterm 1 cterm 76 force 2 velocity 0.000001 maxdist 280
+
+! Run dynamics
+dyna hydro @{hydro} nstep @{nstep} tstep @{tstep} temp @{temp} zeta @{zeta} -
+     dcdfreq @{dcdfreq} nbdfreq @{nbdfreq} outfreq @{outfreq} dijfreq @{dijfreq} - 
+     dcdname @{protname}.dcd
+
+stop
+```
 
 ## Notes
 - Generate paramter files using gen-top, then run dynamics with main-prog.
