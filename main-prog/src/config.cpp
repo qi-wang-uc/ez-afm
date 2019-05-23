@@ -33,12 +33,11 @@ bool Config::read_config(const Str& inp_name) {
         cmd_line = each_line.substr(0,newlen);
         cmd_stream.clear();
         cmd_stream.str(cmd_line);
-        while(cmd_stream >> cmd_tmp)
-            cmds.push_back(cmd_tmp);   
+        while(cmd_stream >> cmd_tmp) cmds.push_back(cmd_tmp);   
         if(cmds.back()=="-") continue;
         // remove "-" if applicable.
         cmds.erase(std::remove(cmds.begin(),cmds.end(),"-"),cmds.end()); 
-		_config.push_back(cmds);
+        _config.push_back(cmds);
         cmds.clear();
     }
     inp_file.close();
@@ -72,9 +71,7 @@ bool Config::exec_config(void) {
         } else if ("stop"==cmd) {
             return true;
         } else {
-            std::cout << "ERROR> Unknown command: "
-                      << cmd 
-                      << std::endl;
+            std::cout << "ERROR> Unknown command: " << cmd  << std::endl;
             return false;
         }
     }
