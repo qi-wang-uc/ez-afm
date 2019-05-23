@@ -16,9 +16,9 @@ void AFM::setup_afm(StrVec cmds, UserVar& user_var) {
     std::cout << "PrepAFM> The following parameters will be used:" << std::endl;
     for(auto it_afm=afm_opt.begin();it_afm!=afm_opt.end(); it_afm++) {
         std::cout << std::left 
-              << std::setw(10) << it_afm->first  << " = " 
-              << std::setw(10) << it_afm->second
-              << std::endl;
+                  << std::setw(10) << it_afm->first  << " = " 
+                  << std::setw(10) << it_afm->second
+                  << std::endl;
     }
     /* afm initialization */
     this->_afm_config.do_afm = true;
@@ -36,8 +36,7 @@ void AFM::setup_afm(StrVec cmds, UserVar& user_var) {
 AfmPair AFM::apply_afm(const Real& tstep, const AfmPair& afm_coors) {
     Vec3d r_nc = afm_coors[1] - afm_coors[0];
     Real tmp_dist = r_nc.norm();
-    if(tmp_dist > _afm_config.max_dist)
-        return AfmPair{Vec3d(0, 0, 0), Vec3d(0, 0, 0)};
+    if(tmp_dist > _afm_config.max_dist) return AfmPair{Vec3d(0, 0, 0), Vec3d(0, 0, 0)};
     Real k_afm = _afm_config.k_afm;
     Real v_afm = _afm_config.v_afm;
     Real force = k_afm * (tmp_dist - _afm_config.tmp_dist);
