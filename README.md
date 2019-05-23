@@ -52,14 +52,14 @@ set outfreq  = 100 	   ! <10> frequency to write energy info and .afm files.
 set dcdfreq  = 10	   ! <10> frequency to write coordinate
 set nbdfreq  = 10	   ! <10> frequency to update nonbonded list
 set dijfreq  = 10	   ! <10> frequency to update diffusion tensor, will be ignored when "hydro" is set to "none".
-set hydro    = none	   ! <none> hydrodynamics [cholesky], [tea], or [none], currently not implemented
+set hydro    = 0	   ! <0>  hydrodynamics (1) or none (0)
 
 ! Read toppar and coordinate into system
-system prm	@{protname}.prm
-system psf	@{protname}.psf
-system cor	@{protname}.cor
+system prm    @{protname}.prm
+system psf    @{protname}.psf
+system cor    @{protname}.cor
 ! fix atom index
-system fix  1
+system fix    1
 
 ! AFM setup
 afm nterm 1 cterm 76 force 2 velocity 0.000001 maxdist 280
