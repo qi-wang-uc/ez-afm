@@ -6,7 +6,7 @@
 #include <algorithm>
 #include <cmath>
 #include <ctime>
-#include "gen-toppar.h"
+#include "gen-toppar.hpp"
 
 /*********************************************************************
 	Note: the format are derived from exist CHARMM-compatible 
