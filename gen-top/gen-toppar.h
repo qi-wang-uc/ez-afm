@@ -29,12 +29,12 @@ struct amino {
 };
 
 const struct Format_Space {
-	std::string space1 = " ";
-	std::string space2 = "  ";
-	std::string space3 = "   ";
-	std::string space4 = "    ";
-	std::string space5 = "     ";
-	std::string space6 = "      ";
+    std::string space1 = " ";
+    std::string space2 = "  ";
+    std::string space3 = "   ";
+    std::string space4 = "    ";
+    std::string space5 = "     ";
+    std::string space6 = "      ";
 } fmt_space;
 
 double calc_dist(const amino& a1, const amino& a2);
