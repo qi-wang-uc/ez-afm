@@ -214,19 +214,19 @@ void make_rtf(const std::string& job_name) {
     out_file << "   20   1" << std::endl;
     for(int i=0; i<amino_acids.size(); i++) {
         out_file << "MASS " << std::right << std::setw(4) << i+1 << fmt_space.space1
-                 << std::left << std::setw(4) << std::string( "A") + std::to_string( i+1) 
+                 << std::left << std::setw(4) << std::string( "A") + std::to_string(i+1) 
                  << fmt_space.space5 << "100.0"
-                  << std::endl;
+                 << std::endl;
     }
     out_file << std::endl << "DECL +CA" << std::endl;
     out_file << std::endl << "AUTOGENERATE ANGLES DIHEDRAL" << std::endl << std::endl;
 
     for(int i=0; i<amino_acids.size(); i++){
         out_file << "RESI " << std::string("P") + std::to_string(i+1) << fmt_space.space1 
-				 << "0.00" << std::endl;
+                 << "0.00" << std::endl;
         out_file << "GROU" << std::endl;
         out_file << "ATOM " << "CA" << fmt_space.space1 << std::string("A") + std::to_string(i+1) 
-				 << " 0.00" << std::endl;
+                 << " 0.00" << std::endl;
         out_file << "BOND " << "CA +CA" << std::endl;
         out_file << std::endl;
     }
@@ -242,21 +242,21 @@ void make_prm(const std::string& job_name) {
 //BOND
     out_file << "BOND" << std::endl;
     for(int i=0; i<amino_acids.size()-1; i++) {
-            out_file << std::left
-                     << std::setw(4) << std::string("A") + std::to_string(i+1) << fmt_space.space1 
-					 << std::setw(4) << std::string("A") + std::to_string(i+2) << "   100.0    3.8" 
-					 << std::endl;
+        out_file << std::left; 
+        out_file << std::setw(4) << std::string("A") + std::to_string(i+1) << fmt_space.space1 
+                 << std::setw(4) << std::string("A") + std::to_string(i+2) << "   100.0    3.8" 
+                 << std::endl;
     }
     out_file << std::endl;
 //ANGLE
     out_file << "ANGLE" << std::endl;
     for(unsigned int i=0; i<amino_acids.size()-2; i++) {
-                out_file << std::left;
-                out_file << std::setw(4) << std::string("A") + std::to_string(i+1) << fmt_space.space1 
-						 << std::setw(4) << std::string("A") + std::to_string(i+2) << fmt_space.space1 
-						 << std::setw(4) << std::string("A") + std::to_string(i+3) << fmt_space.space1 
-                         << "   12.5     1.8326"	// 1.8326 in Rad or 105 in Degrees.
-                		 << std::endl;
+        out_file << std::left;
+        out_file << std::setw(4) << std::string("A") + std::to_string(i+1) << fmt_space.space1 
+                 << std::setw(4) << std::string("A") + std::to_string(i+2) << fmt_space.space1 
+                 << std::setw(4) << std::string("A") + std::to_string(i+3) << fmt_space.space1 
+                 << "   12.5     1.8326"	// 1.8326 in Rad or 105 in Degrees.
+                 << std::endl;
     }
     out_file << std::endl;
 //DIHEDRAL
@@ -289,14 +289,14 @@ void make_prm(const std::string& job_name) {
     out_file << std::endl;
 //NBFIX
     out_file << "NBFIX" << std::endl;
-        for(unsigned int i=0; i<amino_acids.size()-3; i++) {
-            for(unsigned int j=i+3; j<amino_acids.size(); j++) {
-                auto dist = calc_dist(amino_acids[i], amino_acids[j]);
-                if(dist <= r_cutoff) {
-                    out_file << std::setw(4) << std::string("A") + std::to_string(i+1) << fmt_space.space1 
-                             << std::setw(4) << std::string("A") + std::to_string(j+1) << fmt_space.space2 
-                             << std::to_string(eps_native) << fmt_space.space2 << std::to_string(dist) 
-                             << std::endl;
+    for(unsigned int i=0; i<amino_acids.size()-3; i++) {
+        for(unsigned int j=i+3; j<amino_acids.size(); j++) {
+            auto dist = calc_dist(amino_acids[i], amino_acids[j]);
+            if(dist <= r_cutoff) {
+            out_file << std::setw(4) << std::string("A") + std::to_string(i+1) << fmt_space.space1 
+                     << std::setw(4) << std::string("A") + std::to_string(j+1) << fmt_space.space2 
+                     << std::to_string(eps_native) << fmt_space.space2 << std::to_string(dist) 
+                     << std::endl;
                 }
             }
         }
