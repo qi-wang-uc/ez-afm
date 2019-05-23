@@ -13,8 +13,7 @@ class UserVar {
     public:
         void print(void);
         void update(StrVec cmds);
-        Str  query(Str& name) const;
-        
+        Str  query(Str& name) const;      
 };
 
 #endif
