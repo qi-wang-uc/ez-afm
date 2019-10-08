@@ -47,7 +47,7 @@ struct Mat3x3 {
         this->zx *= fact; this->zy *= fact; this->zz *= fact;
         return *this;
     }
-	friend Mat3x3 operator / (const Mat3x3 &mat, const Real &fact) {
+    friend Mat3x3 operator / (const Mat3x3 &mat, const Real &fact) {
         return Mat3x3(mat.xx/fact, mat.xy/fact, mat.xz/fact,
                       mat.yx/fact, mat.yy/fact, mat.yz/fact,
                       mat.zx/fact, mat.zy/fact, mat.zz/fact);
@@ -104,7 +104,7 @@ struct Vec3d {
         return Vec3d(x/norm,y/norm,z/norm);
     }
     /* scalar algebra */
-	friend Vec3d operator * (const Real &fact, const Vec3d &vec) {
+    friend Vec3d operator * (const Real &fact, const Vec3d &vec) {
         return Vec3d(vec.x*fact, vec.y*fact, vec.z*fact);
     }
     Vec3d& operator *= (const Real &fact) {
@@ -113,7 +113,7 @@ struct Vec3d {
         z *= fact;
         return *this;
     }
-	friend Vec3d operator / (const Vec3d &vec, const Real &fact) {
+    friend Vec3d operator / (const Vec3d &vec, const Real &fact) {
         return Vec3d(vec.x/fact, vec.y/fact, vec.z/fact);
     }
     Vec3d& operator /= (const Real &fact) {
@@ -135,10 +135,10 @@ struct Vec3d {
         z -= vec.z;
         return *this;
     }
-	friend Vec3d operator + (const Vec3d &vec1, const Vec3d &vec2) {
+    friend Vec3d operator + (const Vec3d &vec1, const Vec3d &vec2) {
         return Vec3d(vec1.x+vec2.x, vec1.y+vec2.y, vec1.z+vec2.z);
     }
-	friend Vec3d operator - (const Vec3d &vec1, const Vec3d &vec2) {
+    friend Vec3d operator - (const Vec3d &vec1, const Vec3d &vec2) {
         return Vec3d(vec1.x-vec2.x, vec1.y-vec2.y, vec1.z-vec2.z);
     }
     Vec3d cross_product(const Vec3d &vec) {
